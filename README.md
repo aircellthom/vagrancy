@@ -46,7 +46,7 @@ Add something like the following to your `.json` Packer file. For Packer version
         "version": "1.0.0"
       }   
     }   
-  ], 
+  ],
   ...
 ```
 ##### Manually uploading
@@ -64,7 +64,7 @@ Vagrant.configure(2) do |config|
 end
 ```
 ### API
-Operation| Command 
+Operation| Command
 ---------|----------
 **Deleting a box** | `curl -XDELETE http://localhost:8099/myusername/ubuntu/1.0.0/virtualbox`
 **Manually uploading a box** | `curl http://localhost:8099/myusername/ubuntu/1.0.0/virtualbox --upload-file ubuntu-precise.box`
@@ -74,3 +74,6 @@ Operation| Command
 ### Security
 Vagrancy is intending to be used in a trusted network and hence doesn't deal with authentication. As can be see in
 the above examples, reading, writing and modifying boxes is allowed without authentication.
+
+### Docker
+https://hub.docker.com/r/michalciolek/vagrancy/
