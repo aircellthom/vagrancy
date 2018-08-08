@@ -9,7 +9,16 @@ module Vagrancy
     end
 
     def to_h
-      { :version => @version, :providers => providers.collect { |p| p.to_h } } 
+      { 
+        :version => @version, 
+        :status => "released",
+        :release_url => "http://%s:%s/api/v1/box/%s/version/%s/release" % [ @request.host, @request.port, @parent.path, @version ],
+        :providers => providers.collect { |p| p.to_h } 
+      }
+    end
+
+    def to_json
+      to_h.to_json
     end
 
     def exists?

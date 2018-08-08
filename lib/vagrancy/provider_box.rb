@@ -10,7 +10,11 @@ module Vagrancy
     end
 
     def to_h
-      exists? ? {:name => @provider, :url => url} : {}
+      {:name => @provider, :url => url}
+    end
+
+    def to_json
+      exists? ? to_h.to_json : '{ "errors": ["Resource not found!"], "success": false }' 
     end
 
     def write(stream)

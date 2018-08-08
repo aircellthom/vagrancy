@@ -51,10 +51,75 @@ module Vagrancy
       provider_box.delete
     end
 
+
+    #Vagrant cloud api emulation
+    get '/api/v1/box/:username/:name' do
+      box = Vagrancy::Box.new(params[:name], params[:username], filestore, request)
+
+      status box.exists? ? 200 : 404
+      content_type 'application/json'
+      box.to_json
+    end
+
+    post '/api/v1/box/:username/:name/versions' do
+      request.body.rewind
+      request_payload = JSON.parse request.body.read
+      version = request_payload['version']['version']
+
+      box = Vagrancy::Box.new(params[:name], params[:username], filestore, request)
+      box_version = BoxVersion.new(version, box, filestore, request)
+
+      status 200 #box_version.exists? ? 200 : 404
+      content_type 'application/json'
+      box_version.to_json #if box_version.exists?
+    end
+
+    post '/api/v1/box/:username/:name/version/:version/providers' do
+      request.body.rewind
+      request_payload = JSON.parse request.body.read
+      provider = request_payload['provider']['name']
+
+      box = Vagrancy::Box.new(params[:name], params[:username], filestore, request)
+      provider_box = ProviderBox.new(provider, params[:version], box, filestore, request)
+
+      status 200 #provider_box.exists? ? 200 : 404
+      content_type 'application/json'
+      provider_box.to_json #if box_version.exists?      
+    end
+
+    #Api commands that do stuff
+    get '/api/v1/box/:username/:name/version/:version/provider/:provider/upload' do
+      content_type 'application/json'
+      body '{ 
+        "upload_path": "http://%s:%s/api/v1/box/%s/%s/version/%s/provider/%s"
+      }' % [ request.host, request.port, params[:username], params[:name], params[:version], params[:provider] ]
+      status 200
+    end
+
+    put '/api/v1/box/:username/:name/version/:version/provider/:provider' do
+      box = Vagrancy::Box.new(params[:name], params[:username], filestore, request)
+      provider_box = ProviderBox.new(params[:provider], params[:version], box, filestore, request)
+
+      provider_box.write(request.body)
+      status 200
+    end    
+
+    delete '/api/v1/box/:username/:name/version/:version/provider/:provider' do
+      box = Vagrancy::Box.new(params[:name], params[:username], filestore, request)
+      provider_box = ProviderBox.new(params[:provider], params[:version], box, filestore, request)
+
+      status provider_box.exists? ? 200 : 404
+      provider_box.delete
+    end
+
+    put '/api/v1/box/:username/:name/version/:version/release' do
+      status 200
+    end
+
     # Atlas emulation, no authentication
     get '/api/v1/authenticate' do
       status 200
-    end
+    end    
 
     post '/api/v1/artifacts/:username/:name/vagrant.box' do
       content_type 'application/json'

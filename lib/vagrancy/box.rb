@@ -21,10 +21,13 @@ module Vagrancy
     end
 
     def to_json
-      { 
-        :name => "#{@group}/#{@name}",
+      exists? ? { 
+        :tag => path,
+        :username => "#{@group}",
+        :name => path,
+        :private => true,
         :versions => BoxVersions.new(self, @filestore, @request).to_a
-      }.to_json
+      }.to_json : '{ "errors": ["Resource not found!"], "success": false }'
     end
 
   end
